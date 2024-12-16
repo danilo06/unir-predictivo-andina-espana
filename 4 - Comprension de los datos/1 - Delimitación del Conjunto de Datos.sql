@@ -53,3 +53,18 @@ FROM
 WHERE
     c.cod_pais IN ('504', '516', '500', '480');
 
+
+
+-- Consulta de comunidades No identificadas 
+
+SELECT 
+    DATE(anio, mes, 1) AS fecha,
+    COUNT(CASE WHEN nombre_comunidad = 'No determinado' THEN 1 END) AS conteo_no_determinado,
+    COUNT(*) AS total_registros,
+    ROUND(COUNT(CASE WHEN nombre_comunidad = 'No determinado' THEN 1 END) / COUNT(*), 2) AS porcentaje_no_determinado
+FROM 
+    `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina`
+GROUP BY 
+    fecha
+ORDER BY 
+    fecha;
