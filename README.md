@@ -23,6 +23,15 @@ Para visualizar resultados en sitio web ingresar al siguiente link: https://dani
 
 ## Herramientas Utilizadas
 
+- **Spark**: Utilizado para el procesamiento de grandes volúmenes de datos.
+- **Google Cloud Platform (GCP)**: Plataforma utilizada para la infraestructura en la nube.
+- **Cloud Storage de GCP**: Servicio de almacenamiento en la nube utilizado para guardar datos.
+- **Dataproc de GCP**: Servicio de GCP utilizado para ejecutar trabajos de procesamiento de datos.
+- **BigQuery de GCP**: Almacén de datos en la nube utilizado para análisis de grandes volúmenes de datos.
+- **PySpark**: API de Python para trabajar con Apache Spark.
+- **Python**: Lenguaje de programación utilizado para el desarrollo de scripts y notebooks.
+- **SQL**: Lenguaje utilizado para consultas y manipulación de bases de datos.
+- **Looker Studio**: Herramienta de visualización de datos utilizada para crear informes y dashboards.
 - **YData**: Utilizado para generar informes de perfilado de datos.
 - **Sweetviz**: Utilizado para generar visualizaciones y análisis detallados de los datos.
 
