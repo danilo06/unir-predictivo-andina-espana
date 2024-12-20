@@ -1,6 +1,6 @@
 # unir-predictivo-andina-espana
 
-Para visualizar resultados en sitio web ingresar al siguiente link: https://danilo06.github.io/unir-predictivo-andina-espana/
+Para visualizar resultados de perfilamiento o notebooks debe ingresar al siguiente link: https://danilo06.github.io/unir-predictivo-andina-espana/
 
 ## Descripción de Carpetas y Archivos
 
@@ -37,7 +37,7 @@ Para visualizar resultados en sitio web ingresar al siguiente link: https://dani
 
 ## Enlace al Sitio Web
 
-Para visualizar los resultados en el sitio web, ingrese al siguiente enlace: [https://danilo06.github.io/unir-predictivo-andina-espana/](https://danilo06.github.io/unir-predictivo-andina-espana/)
+Para visualizar los resultados de perfilamiento y notebooks en el sitio web, ingrese al siguiente enlace: [https://danilo06.github.io/unir-predictivo-andina-espana/](https://danilo06.github.io/unir-predictivo-andina-espana/)
 
 ## Contacto
 
