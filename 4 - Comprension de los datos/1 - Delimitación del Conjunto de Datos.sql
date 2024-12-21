@@ -1,3 +1,5 @@
+-- Extraer el codigo de pais para cada uno de los miembros de la Comunidad Andina.
+
 SELECT cod_pais, pais 
 FROM `unir-predictiv0-andina-espana.datacomex.paises` 
 WHERE pais LIKE 'Boli%' 
@@ -5,7 +7,7 @@ WHERE pais LIKE 'Boli%'
    OR pais LIKE 'Ecua%' 
    OR pais LIKE 'Per%';
 
-
+-- Verificar la existencia de registros para los paises de la Comunidad Andina en la tabla de Comercio Exterior.
 
 SELECT 
     p.pais AS nombre_pais,
@@ -26,6 +28,7 @@ ORDER BY
     p.pais, fecha;
 
 
+-- Crear una tabla con los registros de comercio exterior para los paises de la Comunidad Andina para perfilado. 
 
 CREATE TABLE `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina` AS
 SELECT
