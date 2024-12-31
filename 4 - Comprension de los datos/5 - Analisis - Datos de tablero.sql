@@ -51,3 +51,46 @@ from
         ON comex.cod_taric_3 = desc_lvl3.cod_taric
     LEFT JOIN `unir-predictiv0-andina-espana.datacomex.clasificacion_taric` AS desc_lvl4 
         ON comex.cod_taric_4 = desc_lvl4.cod_taric
+
+
+-- Limpieza de campos de descripcion. 
+
+
+UPDATE `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_tablero`
+SET 
+taric_desc_1 = CASE
+  WHEN TRIM(REPLACE(REPLACE(REPLACE(taric_desc_1, '_', ''),'.',''),':','')) = 'Las demás' THEN 'Los demás'
+  ELSE CONCAT(
+    UPPER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_1, '_', ''),'.',''),':','')), 1, 1)),
+    LOWER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_1, '_', ''),'.',''),':','')), 2))
+  )
+END,
+taric_desc_2 = CASE
+  WHEN TRIM(REPLACE(REPLACE(REPLACE(taric_desc_2, '_', ''),'.',''),':','')) = 'Las demás' THEN 'Los demás'
+  ELSE CONCAT(
+    UPPER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_2, '_', ''),'.',''),':','')), 1, 1)),
+    LOWER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_2, '_', ''),'.',''),':','')), 2))
+  )
+END,
+taric_desc_3 = CASE
+  WHEN TRIM(REPLACE(REPLACE(REPLACE(taric_desc_3, '_', ''),'.',''),':','')) = 'Las demás' THEN 'Los demás'
+  ELSE CONCAT(
+    UPPER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_3, '_', ''),'.',''),':','')), 1, 1)),
+    LOWER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_3, '_', ''),'.',''),':','')), 2))
+  )
+END,
+taric_desc_4 = CASE
+  WHEN TRIM(REPLACE(REPLACE(REPLACE(taric_desc_4, '_', ''),'.',''),':','')) = 'Las demás' THEN 'Los demás'
+  ELSE CONCAT(
+    UPPER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_4, '_', ''),'.',''),':','')), 1, 1)),
+    LOWER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_4, '_', ''),'.',''),':','')), 2))
+  )
+END,
+taric_desc_5 = CASE
+  WHEN TRIM(REPLACE(REPLACE(REPLACE(taric_desc_5, '_', ''),'.',''),':','')) = 'Las demás' THEN 'Los demás'
+  ELSE CONCAT(
+    UPPER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_5, '_', ''),'.',''),':','')), 1, 1)),
+    LOWER(SUBSTR(TRIM(REPLACE(REPLACE(REPLACE(taric_desc_5, '_', ''),'.',''),':','')), 2))
+  )
+END
+where 1 = 1
