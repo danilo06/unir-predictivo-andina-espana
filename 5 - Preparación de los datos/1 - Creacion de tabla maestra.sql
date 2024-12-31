@@ -1,4 +1,5 @@
-CREATE TABLE `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_modelo` AS with taric as (
+CREATE TABLE `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_modelo` AS 
+WITH taric AS (
     SELECT
         subquery.cod_taric,
         subquery.nivel_taric,
