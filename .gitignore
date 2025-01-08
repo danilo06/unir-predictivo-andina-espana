@@ -1,8 +1,5 @@
-
-*.json
 /.ipynb_checkpoints
-*.csv
 /6 - Modelado/utils/__pycache__
-6 - Modelado/Notas Modelos.ini
-6 - Modelado/output/kmeans_output.parquet
-6 - Modelado/test.ipynb
+*.json
+*.csv
+*.parquet
