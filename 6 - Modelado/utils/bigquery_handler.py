@@ -1,6 +1,7 @@
 from google.cloud import bigquery
 import pandas as pd
 
+
 class BigQueryHandler:
     def __init__(self, project_id: str):
         self.project_id = project_id
@@ -41,16 +42,27 @@ class BigQueryHandler:
             print(f"Created table {dataset_id}.{table_id}.")
         except Exception as e:
             print(f"An error occurred: {e}")
-            
-    def create_or_replace_table(self, dataset_id: str, table_id: str, dataframe: pd.DataFrame):
+
+    def create_or_replace_table(
+        self,
+        dataset_id: str,
+        table_id: str,
+        dataframe: pd.DataFrame,
+        write_disposition="WRITE_TRUNCATE",
+    ):
+        # "WRITE_TRUNCATE": Replaces the existing table content (deletes and rewrites from scratch).
+        # "WRITE_APPEND": Adds the DataFrame rows to the existing table rows.
+        # "WRITE_EMPTY": Fails the operation if the table already contains data.
         try:
             table_ref = self.client.dataset(dataset_id).table(table_id)
-            job = self.client.load_table_from_dataframe(dataframe, table_ref, job_config=bigquery.LoadJobConfig(write_disposition="WRITE_TRUNCATE"))
+            job = self.client.load_table_from_dataframe(
+                dataframe,
+                table_ref,
+                job_config=bigquery.LoadJobConfig(write_disposition=write_disposition),
+            )
             job.result()
-            print(f"Table {dataset_id}.{table_id} created or replaced with {job.output_rows} rows.")
+            print(
+                f"Table {dataset_id}.{table_id} created or replaced with {job.output_rows} rows."
+            )
         except Exception as e:
             print(f"An error occurred: {e}")
-            
-            
-        
-
