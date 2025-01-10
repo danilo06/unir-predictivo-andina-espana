@@ -5,56 +5,53 @@ with taric_base as (
     fecha,
     tipo_movimiento_cod,
     cod_pais,
-    'dolares' AS unidades,
-    SUM(dolares) AS valor
+    SUM(dolares) AS dolares,
+    SUM(kilogramos) AS kilogramos
   FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_modelo`
   WHERE nivel_taric = '1'
-  GROUP BY 1, 2, 3, 4
-  UNION ALL
-  SELECT
-    fecha,
-    tipo_movimiento_cod,
-    cod_pais,
-    'kilogramos' AS unidades,
-    SUM(kilogramos) AS valor
-  FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_modelo`
-  WHERE nivel_taric = '1'
-  GROUP BY 1, 2, 3, 4
+  GROUP BY 1, 2, 3
 ),
 taric_global AS (
   SELECT
     fecha,
     tipo_movimiento_cod,
-    unidades,
-    SUM(valor) AS valor
+    SUM(dolares) AS dolares,
+    SUM(kilogramos) AS kilogramos
   FROM taric_base
-  GROUP BY 1, 2, 3
+  GROUP BY 1, 2
 ),
 taric_general_forecast AS (
   SELECT
-    fecha,
+    dlrs.fecha,
     CASE
-      WHEN llave3 = 'GLOBAL' THEN 'global'
-      ELSE 'pais'
+        WHEN dlrs.llave3 = 'GLOBAL' THEN 'global'
+        ELSE 'pais'
     END AS nivel,
-    llave2 AS tipo_movimiento_cod,
+    dlrs.llave2 AS tipo_movimiento_cod,
     CASE
-      WHEN llave3 = 'GLOBAL' THEN '0000'
-      ELSE llave3
+      WHEN dlrs.llave3 = 'GLOBAL' THEN '0000'
+      ELSE dlrs.llave3
     END AS cod_pais,
-    llave1 AS unidades,
-    prediccion AS valor,
-    modelo
-  FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast`
-  WHERE llave2 <> 'producto'
+    dlrs.prediccion as dolares,
+    klgrms.prediccion as kilogramos,
+    dlrs.modelo
+  FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast` as dlrs
+  INNER JOIN `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast` as klgrms
+    ON dlrs.FORECAST_LEVEL = klgrms.FORECAST_LEVEL
+      AND dlrs.llave2 = klgrms.llave2
+      AND dlrs.llave3 = klgrms.llave3
+      AND dlrs.modelo = klgrms.modelo
+  WHERE dlrs.llave2 <> 'producto'
+    AND dlrs.llave1 = 'dolares'
+    AND klgrms.llave1 = 'kilogramos'
 )
 SELECT
   fecha,
   'pais' AS nivel,
   tipo_movimiento_cod,
   cod_pais,
-  unidades,
-  valor,
+  dolares,
+  kilogramos,
   'original' AS modelo
 FROM taric_base
 UNION ALL
@@ -63,8 +60,8 @@ SELECT
   'global' AS nivel,
   tipo_movimiento_cod,
   '0000' AS cod_pais,
-  unidades,
-  valor,
+  dolares,
+  kilogramos,
   'original' AS modelo
 FROM taric_global
 UNION ALL
@@ -73,7 +70,7 @@ SELECT
   nivel,
   tipo_movimiento_cod,
   cod_pais,
-  unidades,
-  valor,
+  dolares,
+  kilogramos,
   modelo
 FROM taric_general_forecast
