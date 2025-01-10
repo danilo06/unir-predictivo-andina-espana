@@ -74,3 +74,12 @@ SELECT
   kilogramos,
   modelo
 FROM taric_general_forecast
+
+# Filtro dinamico para tomar parametro de referencia 
+
+CASE 
+  WHEN (Modelo = 'ARIMA' AND modelo_org = 'ARIMA') OR (modelo_org = 'original') THEN 'Mostrar'
+  WHEN (Modelo = 'MLP' AND modelo_org = 'MLP') OR (modelo_org = 'original') THEN 'Mostrar'
+  WHEN (Modelo = 'LSTM' AND modelo_org = 'LSTM') OR (modelo_org = 'original') THEN 'Mostrar'
+  ELSE 'Ocultar'
+END
