@@ -5,10 +5,30 @@ with taric_base as (
     fecha,
     tipo_movimiento_cod,
     cod_pais,
+    cod_taric,
     SUM(dolares) AS dolares,
     SUM(kilogramos) AS kilogramos
   FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_modelo`
   WHERE nivel_taric = '1'
+  GROUP BY 1, 2, 3, 4
+),
+taric_productos AS (
+  SELECT
+    fecha,
+    cod_taric,
+    SUM(dolares) AS dolares,
+    SUM(kilogramos) AS kilogramos
+  FROM taric_base
+  GROUP BY 1, 2
+),
+taric_pais as (
+  SELECT
+    fecha,
+    tipo_movimiento_cod,
+    cod_pais,
+    SUM(dolares) AS dolares,
+    SUM(kilogramos) AS kilogramos
+  FROM taric_base
   GROUP BY 1, 2, 3
 ),
 taric_global AS (
@@ -20,66 +40,113 @@ taric_global AS (
   FROM taric_base
   GROUP BY 1, 2
 ),
-taric_general_forecast AS (
+taric_forecast AS (
   SELECT
-    dlrs.fecha,
-    CASE
-        WHEN dlrs.llave3 = 'GLOBAL' THEN 'global'
-        ELSE 'pais'
-    END AS nivel,
-    dlrs.llave2 AS tipo_movimiento_cod,
-    CASE
-      WHEN dlrs.llave3 = 'GLOBAL' THEN '0000'
-      ELSE dlrs.llave3
-    END AS cod_pais,
-    dlrs.prediccion as dolares,
-    klgrms.prediccion as kilogramos,
-    dlrs.modelo
-  FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast` as dlrs
-  INNER JOIN `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast` as klgrms
+      dlrs.fecha,
+      CASE
+          WHEN dlrs.llave2 = 'producto' THEN 'PRODUCTO'
+          WHEN dlrs.llave3 = 'GLOBAL' THEN 'GLOBAL'
+          ELSE 'PAIS'
+      END AS nivel,
+        CASE
+          WHEN dlrs.llave2 = 'producto' THEN 'T'
+          ELSE dlrs.llave2
+      END AS tipo_movimiento_cod,
+      CASE
+        WHEN (dlrs.llave2 = 'producto' OR dlrs.llave3 = 'GLOBAL') THEN '000'
+        ELSE dlrs.llave3
+      END AS cod_pais,
+      CASE
+        WHEN dlrs.llave2 = 'producto' THEN dlrs.llave3
+        ELSE '00'
+      END AS cod_taric,
+      dlrs.prediccion as dolares,
+      klgrms.prediccion as kilogramos,
+      dlrs.modelo
+  FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast` dlrs
+  INNER JOIN `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast` klgrms
     ON dlrs.FORECAST_LEVEL = klgrms.FORECAST_LEVEL
       AND dlrs.llave2 = klgrms.llave2
       AND dlrs.llave3 = klgrms.llave3
       AND dlrs.modelo = klgrms.modelo
-  WHERE dlrs.llave2 <> 'producto'
-    AND dlrs.llave1 = 'dolares'
-    AND klgrms.llave1 = 'kilogramos'
+  WHERE dlrs.llave1 = 'dolares'
+      AND klgrms.llave1 = 'kilogramos'
+      AND dlrs.llave2 <> 'T'
+),
+ taric_limpio as (
+  SELECT DISTINCT
+    cod_taric,
+    descripcion_taric
+  FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_modelo`
+  WHERE nivel_taric = '1'
+),
+all_taric as (
+    SELECT
+    fecha,
+    'PRODUCTO' AS nivel,
+    'T' AS tipo_movimiento_cod,
+    '000' AS cod_pais,
+    cod_taric,
+    dolares,
+    kilogramos,
+    'ORIGINAL' AS modelo
+  FROM taric_productos
+  UNION ALL
+  SELECT
+    fecha,
+    'PAIS' AS nivel,
+    tipo_movimiento_cod,
+    cod_pais,
+    '00' as cod_taric,
+    dolares,
+    kilogramos,
+    'ORIGINAL' AS modelo
+  FROM taric_pais
+  UNION ALL
+  SELECT
+    fecha,
+    'GLOBAL' AS nivel,
+    tipo_movimiento_cod,
+    '000' AS cod_pais,
+    '00' as cod_taric,
+    dolares,
+    kilogramos,
+    'ORIGINAL' AS modelo
+  FROM taric_global
+  UNION ALL
+  SELECT
+    fecha,
+    nivel,
+    tipo_movimiento_cod,
+    cod_pais,
+    cod_taric,
+    dolares,
+    kilogramos,
+    modelo
+  FROM taric_forecast
 )
-SELECT
-  fecha,
-  'pais' AS nivel,
-  tipo_movimiento_cod,
-  cod_pais,
-  dolares,
-  kilogramos,
-  'original' AS modelo
-FROM taric_base
-UNION ALL
-SELECT
-  fecha,
-  'global' AS nivel,
-  tipo_movimiento_cod,
-  '0000' AS cod_pais,
-  dolares,
-  kilogramos,
-  'original' AS modelo
-FROM taric_global
-UNION ALL
-SELECT
-  fecha,
-  nivel,
-  tipo_movimiento_cod,
-  cod_pais,
-  dolares,
-  kilogramos,
-  modelo
-FROM taric_general_forecast
-
-# Filtro dinamico para tomar parametro de referencia 
-
-CASE 
-  WHEN (Modelo = 'ARIMA' AND modelo_org = 'ARIMA') OR (modelo_org = 'original') THEN 'Mostrar'
-  WHEN (Modelo = 'MLP' AND modelo_org = 'MLP') OR (modelo_org = 'original') THEN 'Mostrar'
-  WHEN (Modelo = 'LSTM' AND modelo_org = 'LSTM') OR (modelo_org = 'original') THEN 'Mostrar'
-  ELSE 'Ocultar'
-END
+SELECT 
+  atr.fecha,
+  atr.nivel,
+  atr.tipo_movimiento_cod,
+  CASE 
+    WHEN atr.tipo_movimiento_cod = 'I' THEN 'IMPORTACION'
+    WHEN atr.tipo_movimiento_cod = 'E' THEN 'EXPORTACION'
+    WHEN atr.tipo_movimiento_cod = 'T' THEN 'TOTAL'
+    ELSE atr.tipo_movimiento_cod
+  END AS tipo_movimiento,
+  atr.cod_pais,
+  CASE 
+    WHEN atr.cod_pais = '504' THEN 'PERÚ'
+    WHEN atr.cod_pais = '516' THEN 'BOLIVIA'
+    WHEN atr.cod_pais = '500' THEN 'ECUADOR'
+    WHEN atr.cod_pais = '480' THEN 'COLOMBIA'
+    ELSE 'GLOBAL'
+  END AS pais,
+  atr.cod_taric,
+  COALESCE(tl.descripcion_taric, 'Global') AS descripcion_taric,
+  atr.dolares,
+  atr.kilogramos,
+  atr.modelo
+FROM all_taric atr
+LEFT JOIN taric_limpio tl USING (cod_taric)
