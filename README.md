@@ -37,6 +37,8 @@ Para visualizar resultados de perfilamiento o notebooks debe ingresar al siguien
 
 ## Enlace al Sitio Web
 
+Para visualizar el tablero con las predicciones y análisis descriptivo, ingrese al siguiente enlace: [Predicción y Análisis de la Demanda y Suministro de Productos entre la Comunidad Andina y España](https://lookerstudio.google.com/u/1/reporting/193798f9-5ef9-47f3-bcdc-574e3413392a/page/p_zewzg6d5nd)
+
 Para visualizar los resultados de perfilamiento y notebooks en el sitio web, ingrese al siguiente enlace: [https://danilo06.github.io/unir-predictivo-andina-espana/](https://danilo06.github.io/unir-predictivo-andina-espana/)
 
 ## Contacto
