@@ -24,6 +24,12 @@ Para visualizar resultados de perfilamiento o notebooks debe ingresar al siguien
   - `perfilado_sweetviz/`: Informes de perfilado generados con Sweetviz.
   - `perfilado_ydata/`: Informes de perfilado generados con YData.
 
+- **5 - Preparación de los datos/**: Contiene scripts para la limpieza y transformación de datos para los modelos.
+
+- **6 - Modelado/**: Contiene notebookspara la creación y evaluación de modelos predictivos.
+
+- **8 - Despliegue y visualización de resultados/**: Contiene scripts para el despliegue del modelo y la visualización de resultados.
+
 ## Herramientas Utilizadas
 
 - **Spark**: Utilizado para el procesamiento de grandes volúmenes de datos.
