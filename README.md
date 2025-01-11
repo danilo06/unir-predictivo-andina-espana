@@ -1,5 +1,6 @@
 # unir-predictivo-andina-espana
 
+Para visualizar el tablero con las predicciones y análisis descriptivo, ingrese al siguiente enlace: [Tablero Predicción y Análisis de la Demanda y Suministro de Productos entre la Comunidad Andina y España](https://lookerstudio.google.com/u/1/reporting/193798f9-5ef9-47f3-bcdc-574e3413392a/page/p_zewzg6d5nd)
 Para visualizar resultados de perfilamiento o notebooks debe ingresar al siguiente link: https://danilo06.github.io/unir-predictivo-andina-espana/
 
 ## Descripción de Carpetas y Archivos
