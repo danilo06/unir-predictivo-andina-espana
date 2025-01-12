@@ -40,6 +40,18 @@ taric_global AS (
   FROM taric_base
   GROUP BY 1, 2
 ),
+mape_ranked_predictions AS (
+  SELECT
+    Producto,
+    modelo,
+    prediccion as mape,
+    ROW_NUMBER() OVER (
+      PARTITION BY Producto
+      ORDER BY CAST(prediccion AS FLOAT64) ASC
+    ) AS ranking_modelo
+  FROM
+    `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_mape`
+),
 taric_forecast AS (
   SELECT
       dlrs.fecha,
@@ -62,13 +74,21 @@ taric_forecast AS (
       END AS cod_taric,
       dlrs.prediccion as dolares,
       klgrms.prediccion as kilogramos,
-      dlrs.modelo
+      dlrs.modelo,
+      mrp_dolares.ranking_modelo as dolares_ranking_modelo,
+      mrp_dolares.mape as dolares_mape_modelo,
+      mrp_kilogramos.ranking_modelo as kilogramos_ranking_modelo,
+      mrp_kilogramos.mape as kilogramos_mape_modelo
   FROM `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast` dlrs
   INNER JOIN `unir-predictiv0-andina-espana.datacomex.comex_comunidad_andina_forecast` klgrms
     ON dlrs.FORECAST_LEVEL = klgrms.FORECAST_LEVEL
       AND dlrs.llave2 = klgrms.llave2
       AND dlrs.llave3 = klgrms.llave3
       AND dlrs.modelo = klgrms.modelo
+  LEFT JOIN mape_ranked_predictions AS mrp_dolares
+  ON dlrs.Producto = mrp_dolares.Producto AND dlrs.modelo = mrp_dolares.modelo
+  LEFT JOIN mape_ranked_predictions AS mrp_kilogramos
+  ON klgrms.Producto = mrp_kilogramos.Producto AND klgrms.modelo = mrp_kilogramos.modelo
   WHERE dlrs.llave1 = 'dolares'
       AND klgrms.llave1 = 'kilogramos'
       AND dlrs.llave2 <> 'T'
@@ -90,6 +110,10 @@ all_taric as (
     dolares,
     kilogramos,
     'ORIGINAL' AS modelo
+    ,NULL AS dolares_ranking_modelo
+    ,NULL AS dolares_mape_modelo
+    ,NULL AS kilogramos_ranking_modelo
+    ,NULL AS kilogramos_mape_modelo
   FROM taric_productos
   UNION ALL
   SELECT
@@ -101,6 +125,10 @@ all_taric as (
     dolares,
     kilogramos,
     'ORIGINAL' AS modelo
+    ,NULL AS dolares_ranking_modelo
+    ,NULL AS dolares_mape_modelo
+    ,NULL AS kilogramos_ranking_modelo
+    ,NULL AS kilogramos_mape_modelo
   FROM taric_pais
   UNION ALL
   SELECT
@@ -112,6 +140,10 @@ all_taric as (
     dolares,
     kilogramos,
     'ORIGINAL' AS modelo
+    ,NULL AS dolares_ranking_modelo
+    ,NULL AS dolares_mape_modelo
+    ,NULL AS kilogramos_ranking_modelo
+    ,NULL AS kilogramos_mape_modelo
   FROM taric_global
   UNION ALL
   SELECT
@@ -123,6 +155,10 @@ all_taric as (
     dolares,
     kilogramos,
     modelo
+    ,dolares_ranking_modelo
+    ,dolares_mape_modelo
+    ,kilogramos_ranking_modelo
+    ,kilogramos_mape_modelo
   FROM taric_forecast
 )
 SELECT 
@@ -148,5 +184,9 @@ SELECT
   atr.dolares,
   atr.kilogramos,
   atr.modelo
+  ,dolares_ranking_modelo
+  ,dolares_mape_modelo
+  ,kilogramos_ranking_modelo
+  ,kilogramos_mape_modelo
 FROM all_taric atr
 LEFT JOIN taric_limpio tl USING (cod_taric)
